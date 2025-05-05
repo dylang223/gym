@@ -43,6 +43,9 @@ namespace gym
             // Group workouts by exercise
             var groupedWorkouts = sortedWorkouts.GroupBy(w => w.Exercise);
 
+            // Create a SeriesCollection
+            var seriesCollection = new SeriesCollection();
+
             // Add a line series for each exercise
             foreach (var group in groupedWorkouts)
             {
@@ -63,10 +66,13 @@ namespace gym
                     Stroke = System.Windows.Media.Brushes.Red // Different color for weight
                 };
 
-                // Add the series to the chart
-                ProgressChart.Series.Add(repsSeries);
-                ProgressChart.Series.Add(weightSeries);
+                // Add the series to the collection
+                seriesCollection.Add(repsSeries);
+                seriesCollection.Add(weightSeries);
             }
+
+            // Assign the series collection to the chart
+            ProgressChart.Series = seriesCollection;
 
             // Bind the X-axis labels
             ProgressChart.AxisX[0].Labels = Dates;

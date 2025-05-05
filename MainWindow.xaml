@@ -1,10 +1,6 @@
 ﻿<Window x:Class="gym.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:gym"
-        mc:Ignorable="d"
         Title="Gym Workout Tracker" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -12,17 +8,20 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Add Workout Button -->
-        <Button Content="Add Workout" Click="OpenAddWorkoutWindow" Margin="115,10,0,10" HorizontalAlignment="Left"/>
-        <Button Content="View Progress" Click="OpenProgressWindow" Margin="10" HorizontalAlignment="Left"/>
+        <!-- Buttons Section -->
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Button Content="Add Workout" Click="OpenAddWorkoutWindow" Margin="5"/>
+            <Button Content="Workout Progress" Click="OpenProgressWindow" Margin="5"/>
+        </StackPanel>
 
         <!-- Workout List -->
         <ListView x:Name="WorkoutListView" Grid.Row="1" Margin="10">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="200"/>
+                    <GridViewColumn Header="Exercise" DisplayMemberBinding="{Binding Exercise}" Width="200"/>
                     <GridViewColumn Header="Reps" DisplayMemberBinding="{Binding Reps}" Width="100"/>
                     <GridViewColumn Header="Sets" DisplayMemberBinding="{Binding Sets}" Width="100"/>
+                    <GridViewColumn Header="Weight" DisplayMemberBinding="{Binding Weight}" Width="100"/>
                     <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="200"/>
                 </GridView>
             </ListView.View>

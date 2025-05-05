@@ -37,39 +37,6 @@ namespace gym
             }
         }
 
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-
-            if (textBox != null)
-            {
-                if (textBox.Text == "Workout Name" || textBox.Text == "Reps" || textBox.Text == "Sets")
-                {
-                    textBox.Text = string.Empty;
-                    textBox.Foreground = Brushes.Black; // Set text color to black
-                }
-            }
-        }
-
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-
-            if (textBox != null)
-            {
-                if (string.IsNullOrWhiteSpace(textBox.Text))
-                {
-                    if (textBox.Name == "WorkoutNameTextBox")
-                        textBox.Text = "Workout Name";
-                    else if (textBox.Name == "RepsTextBox")
-                        textBox.Text = "Reps";
-                    else if (textBox.Name == "SetsTextBox")
-                        textBox.Text = "Sets";
-
-                    textBox.Foreground = Brushes.Gray; // Set placeholder text color to gray
-                }
-            }
-        }
         private void OpenProgressWindow(object sender, RoutedEventArgs e)
         {
             if (Workouts.Count == 0)
@@ -78,6 +45,7 @@ namespace gym
                 return;
             }
 
+            // Open the ProgressWindow and pass the workouts
             ProgressWindow progressWindow = new ProgressWindow(Workouts.ToList());
             progressWindow.ShowDialog();
         }
