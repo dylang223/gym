@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,9 +17,69 @@ namespace gym
     /// </summary>
     public partial class MainWindow : Window
     {
+        public ObservableCollection<Workout> Workouts { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
+            Workouts = new ObservableCollection<Workout>();
+            WorkoutListView.ItemsSource = Workouts;
+        }
+
+        private void OpenAddWorkoutWindow(object sender, RoutedEventArgs e)
+        {
+            // Open the AddWorkoutWindow
+            AddWorkoutWindow addWorkoutWindow = new AddWorkoutWindow();
+            if (addWorkoutWindow.ShowDialog() == true)
+            {
+                // Add the new workout to the collection
+                Workouts.Add(addWorkoutWindow.NewWorkout);
+            }
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+
+            if (textBox != null)
+            {
+                if (textBox.Text == "Workout Name" || textBox.Text == "Reps" || textBox.Text == "Sets")
+                {
+                    textBox.Text = string.Empty;
+                    textBox.Foreground = Brushes.Black; // Set text color to black
+                }
+            }
+        }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+
+            if (textBox != null)
+            {
+                if (string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    if (textBox.Name == "WorkoutNameTextBox")
+                        textBox.Text = "Workout Name";
+                    else if (textBox.Name == "RepsTextBox")
+                        textBox.Text = "Reps";
+                    else if (textBox.Name == "SetsTextBox")
+                        textBox.Text = "Sets";
+
+                    textBox.Foreground = Brushes.Gray; // Set placeholder text color to gray
+                }
+            }
+        }
+        private void OpenProgressWindow(object sender, RoutedEventArgs e)
+        {
+            if (Workouts.Count == 0)
+            {
+                MessageBox.Show("No workout data available to display progress.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            ProgressWindow progressWindow = new ProgressWindow(Workouts.ToList());
+            progressWindow.ShowDialog();
         }
     }
 }
