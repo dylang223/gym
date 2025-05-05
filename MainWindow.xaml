@@ -3,28 +3,82 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Gym Workout Tracker" Height="450" Width="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <TabControl Margin="10">
+            <!-- Tab for Logged Exercises -->
+            <TabItem Header="Logged Exercises">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-        <!-- Buttons Section -->
-        <StackPanel Orientation="Horizontal" Margin="10">
-            <Button Content="Add Workout" Click="OpenAddWorkoutWindow" Margin="5"/>
-            <Button Content="Workout Progress" Click="OpenProgressWindow" Margin="5"/>
-        </StackPanel>
+                    <!-- Buttons Section -->
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Button Content="Add Workout" Click="OpenAddWorkoutWindow" Margin="5"/>
+                        <Button Content="Workout Progress" Click="OpenProgressWindow" Margin="5"/>
+                    </StackPanel>
 
-        <!-- Workout List -->
-        <ListView x:Name="WorkoutListView" Grid.Row="1" Margin="10">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Exercise" DisplayMemberBinding="{Binding Exercise}" Width="200"/>
-                    <GridViewColumn Header="Reps" DisplayMemberBinding="{Binding Reps}" Width="100"/>
-                    <GridViewColumn Header="Sets" DisplayMemberBinding="{Binding Sets}" Width="100"/>
-                    <GridViewColumn Header="Weight" DisplayMemberBinding="{Binding Weight}" Width="100"/>
-                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="200"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                    <!-- Workout List -->
+                    <ListView x:Name="WorkoutListView" Grid.Row="1" Margin="10">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Exercise" DisplayMemberBinding="{Binding Exercise}" Width="200"/>
+                                <GridViewColumn Header="Reps" DisplayMemberBinding="{Binding Reps}" Width="100"/>
+                                <GridViewColumn Header="Sets" DisplayMemberBinding="{Binding Sets}" Width="100"/>
+                                <GridViewColumn Header="Weight" DisplayMemberBinding="{Binding Weight}" Width="100"/>
+                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="200"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </TabItem>
+
+            <!-- Tab for Example Workouts -->
+            <TabItem Header="Example Workouts">
+                <TabControl Margin="10">
+                    <!-- Push Tab -->
+                    <TabItem Header="Push">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Example Push Day Workouts" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <ListView>
+                                <ListViewItem>Bench Press - 4 sets of 8 reps</ListViewItem>
+                                <ListViewItem>Incline Dumbbell Press - 3 sets of 10 reps</ListViewItem>
+                                <ListViewItem>Overhead Shoulder Press - 3 sets of 10 reps</ListViewItem>
+                                <ListViewItem>Triceps Pushdown - 3 sets of 12 reps</ListViewItem>
+                                <ListViewItem>Lateral Raises - 3 sets of 15 reps</ListViewItem>
+                            </ListView>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Pull Tab -->
+                    <TabItem Header="Pull">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Example Pull Day Workouts" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <ListView>
+                                <ListViewItem>Deadlift - 4 sets of 6 reps</ListViewItem>
+                                <ListViewItem>Pull-Ups - 3 sets of 10 reps</ListViewItem>
+                                <ListViewItem>Barbell Rows - 3 sets of 8 reps</ListViewItem>
+                                <ListViewItem>Face Pulls - 3 sets of 12 reps</ListViewItem>
+                                <ListViewItem>Biceps Curls - 3 sets of 12 reps</ListViewItem>
+                            </ListView>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Legs Tab -->
+                    <TabItem Header="Legs">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Example Legs Day Workouts" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <ListView>
+                                <ListViewItem>Squats - 4 sets of 8 reps</ListViewItem>
+                                <ListViewItem>Leg Press - 3 sets of 10 reps</ListViewItem>
+                                <ListViewItem>Romanian Deadlifts - 3 sets of 10 reps</ListViewItem>
+                                <ListViewItem>Walking Lunges - 3 sets of 12 reps per leg</ListViewItem>
+                                <ListViewItem>Calf Raises - 3 sets of 15 reps</ListViewItem>
+                            </ListView>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
