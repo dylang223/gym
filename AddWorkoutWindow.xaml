@@ -1,7 +1,7 @@
 ﻿<Window x:Class="gym.AddWorkoutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Add Workout" Height="300" Width="400">
+        Title="Add Workout" Height="366" Width="400">
     <Grid Margin="10">
         <StackPanel>
             <TextBlock Text="Exercise Name:" Margin="5"/>
