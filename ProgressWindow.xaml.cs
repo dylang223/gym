@@ -22,7 +22,7 @@ namespace gym
     /// </summary>
     public partial class ProgressWindow : Window
     {
-        public List<string> Dates { get; set; } // X-axis labels (dates)
+        public List<string> Dates { get; set; } 
 
         public ProgressWindow(List<Workout> workouts)
         {
@@ -34,22 +34,21 @@ namespace gym
                 return;
             }
 
-            // Sort workouts by date
+           
             var sortedWorkouts = workouts.OrderBy(w => w.Date).ToList();
 
-            // Extract unique dates for the X-axis
             Dates = sortedWorkouts.Select(w => w.Date.ToShortDateString()).Distinct().ToList();
 
-            // Group workouts by exercise
+         
             var groupedWorkouts = sortedWorkouts.GroupBy(w => w.Exercise);
 
-            // Create a SeriesCollection
+      
             var seriesCollection = new SeriesCollection();
 
-            // Add a line series for each exercise
+          
             foreach (var group in groupedWorkouts)
             {
-                // Create a line series for reps
+              
                 var repsSeries = new LineSeries
                 {
                     Title = $"{group.Key} (Reps)",
@@ -57,24 +56,24 @@ namespace gym
                     PointGeometrySize = 10
                 };
 
-                // Create a line series for weight
+               
                 var weightSeries = new LineSeries
                 {
                     Title = $"{group.Key} (Weight)",
                     Values = new ChartValues<double>(group.Select(w => w.Weight)),
                     PointGeometrySize = 10,
-                    Stroke = System.Windows.Media.Brushes.Red // Different color for weight
+                    Stroke = System.Windows.Media.Brushes.Red 
                 };
 
-                // Add the series to the collection
+              
                 seriesCollection.Add(repsSeries);
                 seriesCollection.Add(weightSeries);
             }
 
-            // Assign the series collection to the chart
+          
             ProgressChart.Series = seriesCollection;
 
-            // Bind the X-axis labels
+          
             ProgressChart.AxisX[0].Labels = Dates;
         }
     }
