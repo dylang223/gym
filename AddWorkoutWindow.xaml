@@ -1,9 +1,15 @@
 ﻿<Window x:Class="gym.AddWorkoutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Add Workout" Height="366" Width="400">
+        Title="Add Workout" Height="393" Width="400">
     <Grid Margin="10">
         <StackPanel>
+            <TextBlock Text="Category:"/>
+            <ComboBox x:Name="CategoryComboBox" Margin="5" SelectedIndex="0">
+                <ComboBoxItem Content="Push"/>
+                <ComboBoxItem Content="Pull"/>
+                <ComboBoxItem Content="Legs"/>
+            </ComboBox>
             <TextBlock Text="Exercise Name:" Margin="5"/>
             <TextBox x:Name="ExerciseNameTextBox" Margin="5"/>
 

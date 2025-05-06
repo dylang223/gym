@@ -28,7 +28,8 @@ namespace gym
 
         private void AddWorkout_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(ExerciseNameTextBox.Text) ||
+            if (CategoryComboBox.SelectedItem == null ||
+                string.IsNullOrWhiteSpace(ExerciseNameTextBox.Text) ||
                 !int.TryParse(RepsTextBox.Text, out int reps) ||
                 !int.TryParse(SetsTextBox.Text, out int sets) ||
                 !double.TryParse(WeightTextBox.Text, out double weight) ||
@@ -38,9 +39,13 @@ namespace gym
                 return;
             }
 
+            // Get the selected category
+            string category = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+
             // Create a new workout object
             NewWorkout = new Workout
             {
+                Category = category,
                 Exercise = ExerciseNameTextBox.Text,
                 Reps = reps,
                 Sets = sets,
