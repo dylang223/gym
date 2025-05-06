@@ -9,6 +9,7 @@ namespace gym
 {
     public class Workout
     {
+        public string Category { get; set; }
         public string Exercise { get; set; }  
         public int Reps { get; set; }        
         public int Sets { get; set; }        
