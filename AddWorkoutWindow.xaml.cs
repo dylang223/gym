@@ -39,7 +39,7 @@ namespace gym
                 return;
             }
 
-           
+            // Get the selected category
             string category = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
 
             // Create a new workout object
@@ -53,7 +53,7 @@ namespace gym
                 Date = WorkoutDatePicker.SelectedDate.Value
             };
 
-            
+            // Close the window and return to the main screen
             DialogResult = true;
             Close();
         }

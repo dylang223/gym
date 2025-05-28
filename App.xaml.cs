@@ -16,7 +16,7 @@ namespace gym
         {
             base.OnStartup(e);
 
-            // change date format to dd/MM/yyyy
+            // Set the culture to European format
             var culture = new CultureInfo("en-GB");
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
