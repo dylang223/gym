@@ -1,85 +1,553 @@
 ﻿<Window x:Class="gym.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Gym Workout Tracker" Height="450" Width="800">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:gym"
+        mc:Ignorable="d"
+        Title="FitTrack Pro" 
+        Height="700" 
+        Width="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}">
+
+    <Window.Resources>
+        <local:VolumeConverter x:Key="VolumeConverter"/>
+    </Window.Resources>
+
     <Grid>
-        <TabControl Margin="10">
-            <!-- Tab for Logged Exercises -->
-            <TabItem Header="Logged Exercises">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                    <!-- Buttons Section -->
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <Button Content="Add Workout" Click="OpenAddWorkoutWindow" Margin="5"/>
-                        <Button Content="Workout Progress" Click="OpenProgressWindow" Margin="5"/>
-                    </StackPanel>
+        <!-- App Header -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource PrimaryBrush}" 
+                Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Workout List -->
-                    <ListView x:Name="WorkoutListView" Grid.Row="1" Margin="10">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Category" DisplayMemberBinding="{Binding Category}" Width="100"/>
-                                <GridViewColumn Header="Exercise" DisplayMemberBinding="{Binding Exercise}" Width="200"/>
-                                <GridViewColumn Header="Reps" DisplayMemberBinding="{Binding Reps}" Width="100"/>
-                                <GridViewColumn Header="Sets" DisplayMemberBinding="{Binding Sets}" Width="100"/>
-                                <GridViewColumn Header="Weight" DisplayMemberBinding="{Binding Weight}" Width="100"/>
-                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="200"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </Grid>
-            </TabItem>
+                <StackPanel Grid.Column="0" 
+                            Orientation="Horizontal" 
+                            VerticalAlignment="Center">
+                    <TextBlock Text="FitTrack" 
+                               FontSize="22" 
+                               FontWeight="Bold" 
+                               Foreground="White"/>
+                    <TextBlock Text="Pro" 
+                               FontSize="22" 
+                               Foreground="White" 
+                               Opacity="0.8" 
+                               Margin="3,0,0,0"/>
+                </StackPanel>
 
-            <!-- Tab for Example Workouts -->
-            <TabItem Header="Example Workouts">
-                <TabControl Margin="10">
-                    <!-- Push Tab -->
-                    <TabItem Header="Push">
-                        <StackPanel Margin="10">
-                            <TextBlock Text="Example Push Day Workouts" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                            <ListView>
-                                <ListViewItem>Bench Press - 4 sets of 8 reps</ListViewItem>
-                                <ListViewItem>Incline Dumbbell Press - 3 sets of 10 reps</ListViewItem>
-                                <ListViewItem>Overhead Shoulder Press - 3 sets of 10 reps</ListViewItem>
-                                <ListViewItem>Triceps Pushdown - 3 sets of 12 reps</ListViewItem>
-                                <ListViewItem>Lateral Raises - 3 sets of 15 reps</ListViewItem>
-                            </ListView>
-                        </StackPanel>
+                <TextBlock Grid.Column="1" 
+                           Text="Track your fitness journey" 
+                           Foreground="White" 
+                           Opacity="0.8" 
+                           VerticalAlignment="Center" 
+                           HorizontalAlignment="Center" 
+                           FontSize="14"/>
+
+                <StackPanel Grid.Column="2" 
+                            Orientation="Horizontal" 
+                            VerticalAlignment="Center">
+                    <Button Content="+ New Workout" 
+                            Click="OpenAddWorkoutWindow" 
+                            Style="{StaticResource AccentButton}" 
+                            FontSize="13"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Navigation Panel -->
+            <Border Grid.Column="0" 
+                    Background="{StaticResource CardBackgroundBrush}"
+                    CornerRadius="8" 
+                    Margin="0,0,15,0"
+                    BorderThickness="1"
+                    BorderBrush="{StaticResource BorderBrush}">
+
+                <StackPanel>
+                    <TextBlock Text="DASHBOARD" 
+                               Margin="20,20,20,10" 
+                               Foreground="{StaticResource TextSecondaryBrush}" 
+                               FontSize="12" 
+                               FontWeight="Bold"/>
+
+                    <Button x:Name="WorkoutsButton" 
+                            Content="My Workouts"
+                            Click="NavigationButton_Click"
+                            Tag="WorkoutsTab"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,5"/>
+                    <Button x:Name="StatsButton" 
+                            
+                            Content="Workout Stats"
+                            Click="NavigationButton_Click"
+                            Tag="StatsTab"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,5"/>
+
+
+                    <Button x:Name="ProgressButton"
+                            Content="Progress Charts" 
+                            Click="OpenProgressWindow"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,5"/>
+
+                    <Separator Margin="15,10"/>
+
+                    <TextBlock Text="WORKOUT TEMPLATES" 
+                               Margin="20,10,20,10" 
+                               Foreground="{StaticResource TextSecondaryBrush}" 
+                               FontSize="12" 
+                               FontWeight="Bold"/>
+
+                    <Button Content="Push Day" 
+                            Click="NavigationButton_Click"
+                            Tag="PushTab"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,5"/>
+
+                    <Button Content="Pull Day" 
+                            Click="NavigationButton_Click"
+                            Tag="PullTab"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,5"/>
+
+                    <Button Content="Legs Day" 
+                            Click="NavigationButton_Click"
+                            Tag="LegsTab"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,5"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Content Area -->
+            <Border Grid.Column="1" 
+                    Background="{StaticResource CardBackgroundBrush}"
+                    CornerRadius="8"
+                    BorderThickness="1"
+                    BorderBrush="{StaticResource BorderBrush}">
+
+                <TabControl x:Name="MainTabControl"
+                            Style="{StaticResource ModernTabControl}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Margin="0"
+                            Padding="0">
+
+                    <!-- Workouts Tab -->
+                    <TabItem x:Name="WorkoutsTab" Header="My Workouts" Style="{StaticResource ModernTabItem}" Visibility="Collapsed">
+                        <Grid Margin="20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" 
+                                       Text="Workout History" 
+                                       Style="{StaticResource HeaderTextStyle}"/>
+
+                            <Grid Grid.Row="1" Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" 
+                                           Text="Track your progress over time" 
+                                           Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                                <Button Grid.Column="1" 
+                                        Content="Add Workout" 
+                                        Style="{StaticResource ModernButton}" 
+                                        Click="OpenAddWorkoutWindow"/>
+                            </Grid>
+
+                            <Border Grid.Row="2"
+                                    Background="White"
+                                    CornerRadius="6"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+
+                                <ListView x:Name="WorkoutListView"
+                                          BorderThickness="0"
+                                          Background="Transparent">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="DATE" Width="100">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Date, StringFormat=MM/dd/yyyy}" FontWeight="SemiBold"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="CATEGORY" Width="100">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Category}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="EXERCISE" Width="180">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Exercise}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="SETS" Width="60">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Sets}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="REPS" Width="60">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Reps}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="WEIGHT (KG)" Width="100">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Weight, StringFormat='{}{0:F1}'}" FontWeight="SemiBold"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="VOLUME" Width="100">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Sets, Converter={StaticResource VolumeConverter}, ConverterParameter={RelativeSource Self}}" />
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </Border>
+                        </Grid>
                     </TabItem>
 
-                    <!-- Pull Tab -->
-                    <TabItem Header="Pull">
-                        <StackPanel Margin="10">
-                            <TextBlock Text="Example Pull Day Workouts" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                            <ListView>
-                                <ListViewItem>Deadlift - 4 sets of 6 reps</ListViewItem>
-                                <ListViewItem>Pull-Ups - 3 sets of 10 reps</ListViewItem>
-                                <ListViewItem>Barbell Rows - 3 sets of 8 reps</ListViewItem>
-                                <ListViewItem>Face Pulls - 3 sets of 12 reps</ListViewItem>
-                                <ListViewItem>Biceps Curls - 3 sets of 12 reps</ListViewItem>
-                            </ListView>
-                        </StackPanel>
+                    <!-- Push Day Tab -->
+                    <TabItem x:Name="PushTab" Header="Push Day" Style="{StaticResource ModernTabItem}" Visibility="Collapsed">
+                        <Grid Margin="20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" 
+                                       Text="Push Day Workout" 
+                                       Style="{StaticResource HeaderTextStyle}"/>
+
+                            <TextBlock Grid.Row="1" 
+                                       Text="Focus on chest, shoulders, and triceps" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       Margin="0,0,0,15"/>
+
+                            <Border Grid.Row="2"
+                                    Background="White"
+                                    CornerRadius="6"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+
+                                <ItemsControl Margin="15">
+                                    <ItemsControl.ItemsSource>
+                                        <x:Array Type="{x:Type local:ExerciseTemplate}">
+                                            <local:ExerciseTemplate Exercise="Bench Press" Description="4 sets of 8-12 reps - Primary chest compound movement"/>
+                                            <local:ExerciseTemplate Exercise="Incline Dumbbell Press" Description="3 sets of 10-12 reps - Upper chest development"/>
+                                            <local:ExerciseTemplate Exercise="Overhead Shoulder Press" Description="3 sets of 8-10 reps - Primary shoulder compound movement"/>
+                                            <local:ExerciseTemplate Exercise="Triceps Pushdown" Description="3 sets of 12-15 reps - Isolates triceps"/>
+                                            <local:ExerciseTemplate Exercise="Lateral Raises" Description="3 sets of 15 reps - Targets side deltoids"/>
+                                        </x:Array>
+                                    </ItemsControl.ItemsSource>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource CardBackgroundBrush}"
+                                                    Margin="0,5"
+                                                    Padding="15"
+                                                    CornerRadius="6">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="{Binding Exercise}" 
+                                                                   FontWeight="SemiBold" 
+                                                                   FontSize="14"/>
+                                                        <TextBlock Text="{Binding Description}" 
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                                   Margin="0,5,0,0"/>
+                                                    </StackPanel>
+
+                                                    <Button Grid.Column="1"
+                                                            Content="Log Workout"
+                                                            Tag="{Binding Exercise}"
+                                                            Style="{StaticResource ModernButton}"
+                                                            Click="LogTemplateWorkout_Click"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Grid>
                     </TabItem>
 
-                    <!-- Legs Tab -->
-                    <TabItem Header="Legs">
-                        <StackPanel Margin="10">
-                            <TextBlock Text="Example Legs Day Workouts" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                            <ListView>
-                                <ListViewItem>Squats - 4 sets of 8 reps</ListViewItem>
-                                <ListViewItem>Leg Press - 3 sets of 10 reps</ListViewItem>
-                                <ListViewItem>Romanian Deadlifts - 3 sets of 10 reps</ListViewItem>
-                                <ListViewItem>Walking Lunges - 3 sets of 12 reps per leg</ListViewItem>
-                                <ListViewItem>Calf Raises - 3 sets of 15 reps</ListViewItem>
-                            </ListView>
-                        </StackPanel>
+                    <!-- Pull Day Tab -->
+                    <TabItem x:Name="PullTab" Header="Pull Day" Style="{StaticResource ModernTabItem}" Visibility="Collapsed">
+                        <Grid Margin="20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" 
+                                       Text="Pull Day Workout" 
+                                       Style="{StaticResource HeaderTextStyle}"/>
+
+                            <TextBlock Grid.Row="1" 
+                                       Text="Focus on back and biceps" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       Margin="0,0,0,15"/>
+
+                            <Border Grid.Row="2"
+                                    Background="White"
+                                    CornerRadius="6"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+
+                                <ItemsControl Margin="15">
+                                    <ItemsControl.ItemsSource>
+                                        <x:Array Type="{x:Type local:ExerciseTemplate}">
+                                            <local:ExerciseTemplate Exercise="Deadlift" Description="4 sets of 6-8 reps - Primary back compound movement"/>
+                                            <local:ExerciseTemplate Exercise="Pull-Ups" Description="3 sets of 8-12 reps - Upper back and lats development"/>
+                                            <local:ExerciseTemplate Exercise="Barbell Rows" Description="3 sets of 8-10 reps - Mid-back development"/>
+                                            <local:ExerciseTemplate Exercise="Face Pulls" Description="3 sets of 12-15 reps - Rear deltoids and upper back"/>
+                                            <local:ExerciseTemplate Exercise="Biceps Curls" Description="3 sets of 12 reps - Isolates biceps"/>
+                                        </x:Array>
+                                    </ItemsControl.ItemsSource>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource CardBackgroundBrush}"
+                                                    Margin="0,5"
+                                                    Padding="15"
+                                                    CornerRadius="6">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="{Binding Exercise}" 
+                                                                   FontWeight="SemiBold" 
+                                                                   FontSize="14"/>
+                                                        <TextBlock Text="{Binding Description}" 
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                                   Margin="0,5,0,0"/>
+                                                    </StackPanel>
+
+                                                    <Button Grid.Column="1"
+                                                            Content="Log Workout"
+                                                            Tag="{Binding Exercise}"
+                                                            Style="{StaticResource ModernButton}"
+                                                            Click="LogTemplateWorkout_Click"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Legs Day Tab -->
+                    <TabItem x:Name="LegsTab" Header="Legs Day" Style="{StaticResource ModernTabItem}" Visibility="Collapsed">
+                        <Grid Margin="20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" 
+                                       Text="Legs Day Workout" 
+                                       Style="{StaticResource HeaderTextStyle}"/>
+
+                            <TextBlock Grid.Row="1" 
+                                       Text="Focus on quadriceps, hamstrings, and calves" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       Margin="0,0,0,15"/>
+
+                            <Border Grid.Row="2"
+                                    Background="White"
+                                    CornerRadius="6"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+
+                                <ItemsControl Margin="15">
+                                    <ItemsControl.ItemsSource>
+                                        <x:Array Type="{x:Type local:ExerciseTemplate}">
+                                            <local:ExerciseTemplate Exercise="Squats" Description="4 sets of 8 reps - Primary leg compound movement"/>
+                                            <local:ExerciseTemplate Exercise="Leg Press" Description="3 sets of 10-12 reps - Quadriceps and glutes"/>
+                                            <local:ExerciseTemplate Exercise="Romanian Deadlifts" Description="3 sets of 10 reps - Hamstrings focus"/>
+                                            <local:ExerciseTemplate Exercise="Walking Lunges" Description="3 sets of 12 reps per leg - Leg stability and strength"/>
+                                            <local:ExerciseTemplate Exercise="Calf Raises" Description="3 sets of 15 reps - Calf development"/>
+                                        </x:Array>
+                                    </ItemsControl.ItemsSource>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource CardBackgroundBrush}"
+                                                    Margin="0,5"
+                                                    Padding="15"
+                                                    CornerRadius="6">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="{Binding Exercise}" 
+                                                                   FontWeight="SemiBold" 
+                                                                   FontSize="14"/>
+                                                        <TextBlock Text="{Binding Description}" 
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                                   Margin="0,5,0,0"/>
+                                                    </StackPanel>
+
+                                                    <Button Grid.Column="1"
+                                                            Content="Log Workout"
+                                                            Tag="{Binding Exercise}"
+                                                            Style="{StaticResource ModernButton}"
+                                                            Click="LogTemplateWorkout_Click"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Stats Summary Tab -->
+                    <TabItem x:Name="StatsTab" Header="Workout Stats" Style="{StaticResource ModernTabItem}" Visibility="Collapsed">
+                        <Grid Margin="20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" 
+                                       Text="Workout Statistics Summary" 
+                                       Style="{StaticResource HeaderTextStyle}"/>
+
+                            <TextBlock Grid.Row="1" 
+                                       Text="Key performance metrics and achievements" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       Margin="0,0,0,15"/>
+
+                            <Border Grid.Row="2"
+                                    Background="White"
+                                    CornerRadius="6"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+
+                                <ItemsControl x:Name="StatsItemsControl" Margin="15">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource CardBackgroundBrush}"
+                                                    Margin="0,8"
+                                                    Padding="15"
+                                                    CornerRadius="6">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Column="0" 
+                                                               Text="{Binding Icon}" 
+                                                               FontSize="28"
+                                                               VerticalAlignment="Center"
+                                                               Margin="0,0,15,0"/>
+
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding StatName}" 
+                                                                   FontWeight="SemiBold" 
+                                                                   FontSize="16"/>
+                                                        <TextBlock Text="{Binding Description}" 
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                                   Margin="0,5,0,0"
+                                                                   TextWrapping="Wrap"/>
+                                                    </StackPanel>
+
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Value}" 
+                                                               FontWeight="Bold"
+                                                               FontSize="20"
+                                                               Foreground="{StaticResource PrimaryDarkBrush}"
+                                                               VerticalAlignment="Center"
+                                                               Margin="15,0,0,0"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Grid>
                     </TabItem>
                 </TabControl>
-            </TabItem>
-        </TabControl>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

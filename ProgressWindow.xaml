@@ -3,22 +3,151 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         mc:Ignorable="d"
-        Title="Exercise Progress" Height="450" Width="800">
-    <Grid Margin="10">
-        <StackPanel>
-            <TextBlock Text="Exercise Progress Over Time" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+        Title="Exercise Progress" Height="600" Width="1000"
+        Background="#F5F5F5"
+        WindowStartupLocation="CenterScreen">
 
-            <!-- Line Chart -->
-            <lvc:CartesianChart x:Name="ProgressChart" Height="300" Margin="0,10,0,10">
-                <lvc:CartesianChart.AxisX>
-                    <lvc:Axis Title="Date" Labels="{Binding Dates}"/>
-                </lvc:CartesianChart.AxisX>
-                <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Reps/Weight"/>
-                </lvc:CartesianChart.AxisY>
-            </lvc:CartesianChart>
-        </StackPanel>
+    <Window.Resources>
+        <Style x:Key="TitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#388E3C"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="10,5"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="Exercise Progress Over Time" Style="{StaticResource TitleStyle}"/>
+
+        <!-- Filter Controls -->
+        <Border Grid.Row="1" 
+                Background="White" 
+                CornerRadius="10" 
+                Padding="15" 
+                Margin="0,0,0,20"
+                BorderThickness="1"
+                BorderBrush="#DDDDDD">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="5">
+                    <TextBlock Text="Category" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="CategoryFilter" Style="{StaticResource ComboBoxStyle}" SelectionChanged="Filter_SelectionChanged"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="5">
+                    <TextBlock Text="Exercise" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="ExerciseFilter" Style="{StaticResource ComboBoxStyle}" SelectionChanged="Filter_SelectionChanged"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="5">
+                    <TextBlock Text="Date Range" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="DateRangeFilter" Style="{StaticResource ComboBoxStyle}" SelectionChanged="Filter_SelectionChanged">
+                        <ComboBoxItem Content="Last 7 days"/>
+                        <ComboBoxItem Content="Last 30 days"/>
+                        <ComboBoxItem Content="Last 90 days"/>
+                        <ComboBoxItem Content="All time" IsSelected="True"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <Button Grid.Column="3" 
+                        Content="Reset Filters" 
+                        Style="{StaticResource ButtonStyle}"
+                        Click="ResetFilters_Click"
+                        VerticalAlignment="Bottom"/>
+            </Grid>
+        </Border>
+
+        <!-- Chart -->
+        <Border Grid.Row="2" 
+                Background="White" 
+                CornerRadius="10" 
+                Padding="15"
+                BorderThickness="1"
+                BorderBrush="#DDDDDD">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" 
+                           Text="Progress Chart" 
+                           FontSize="18" 
+                           FontWeight="SemiBold" 
+                           Margin="0,0,0,10"/>
+
+                <lvc:CartesianChart Grid.Row="1"
+                                    x:Name="ProgressChart"
+                                    XAxes="{Binding XAxes}" 
+                                    YAxes="{Binding YAxes}" 
+                                    Series="{Binding Series}"
+                                    LegendPosition="Right"/>
+            </Grid>
+        </Border>
+
+        <!-- Summary Stats -->
+        <Border Grid.Row="3" 
+                Background="White" 
+                CornerRadius="10" 
+                Padding="15" 
+                Margin="0,20,0,0"
+                BorderThickness="1"
+                BorderBrush="#DDDDDD">
+            <StackPanel>
+                <TextBlock Text="Summary Statistics" 
+                           FontSize="16" 
+                           FontWeight="SemiBold" 
+                           Margin="0,0,0,10"/>
+
+                <TextBlock x:Name="SummaryText" Text="No data to display." Margin="0,5"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
