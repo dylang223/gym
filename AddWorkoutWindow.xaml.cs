@@ -57,5 +57,21 @@ namespace gym
             DialogResult = true;
             Close();
         }
+        // Add this method to your AddWorkoutWindow class
+        public void PreFillExercise(string exerciseName, string category)
+        {
+            if (NewWorkout == null)
+                NewWorkout = new Workout();
+
+            NewWorkout.Exercise = exerciseName;
+            NewWorkout.Category = category;
+
+            // Update UI controls if they're already initialized
+            if (ExerciseNameTextBox != null)
+                ExerciseNameTextBox.Text = exerciseName;
+            if (CategoryComboBox != null)
+                CategoryComboBox.Text = category;
+        }
+
     }
 }

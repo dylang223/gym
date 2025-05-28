@@ -4,6 +4,158 @@
              xmlns:local="clr-namespace:gym"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Colors -->
+                <ResourceDictionary>
+                    <!-- App theme colors -->
+                    <Color x:Key="PrimaryColor">#3498DB</Color>
+                    <Color x:Key="PrimaryLightColor">#5DADE2</Color>
+                    <Color x:Key="PrimaryDarkColor">#2874A6</Color>
+                    <Color x:Key="AccentColor">#FF5722</Color>
+                    <Color x:Key="TextPrimaryColor">#212121</Color>
+                    <Color x:Key="TextSecondaryColor">#757575</Color>
+                    <Color x:Key="BorderColor">#BDBDBD</Color>
+                    <Color x:Key="BackgroundColor">#FFFFFF</Color>
+                    <Color x:Key="CardBackgroundColor">#F9F9F9</Color>
+
+                    <!-- Brushes -->
+                    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+                    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource PrimaryLightColor}"/>
+                    <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDarkColor}"/>
+                    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+                    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}"/>
+                    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}"/>
+                    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+                    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+                    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackgroundColor}"/>
+                </ResourceDictionary>
+
+                <!-- Styles -->
+                <ResourceDictionary>
+                    <!-- Modern Button Style -->
+                    <Style x:Key="ModernButton" TargetType="Button">
+                        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Padding" Value="15,10"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" 
+                                            CornerRadius="4"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <!-- Accent Button Style -->
+                    <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#E64A19"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <!-- ListView Item Style -->
+                    <Style x:Key="ModernListViewItem" TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="8,12"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListViewItem">
+                                    <Border x:Name="Border" 
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            Margin="0,2">
+                                        <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#E3F2FD" TargetName="Border"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}" TargetName="Border"/>
+                                            <Setter Property="BorderThickness" Value="0,0,0,0" TargetName="Border"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#F5F5F5" TargetName="Border"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                    <!-- TabControl Style -->
+                    <Style x:Key="ModernTabControl" TargetType="TabControl">
+                        <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+
+                    <!-- TabItem Style -->
+                    <Style x:Key="ModernTabItem" TargetType="TabItem">
+                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="15,10"/>
+                        <Setter Property="Margin" Value="0,0,4,0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Grid>
+                                        <Border Name="Border" 
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                                CornerRadius="4,4,0,0">
+                                            <ContentPresenter Name="ContentSite" 
+                                                            ContentSource="Header" 
+                                                            HorizontalAlignment="Center" 
+                                                            VerticalAlignment="Center" 
+                                                            Margin="{TemplateBinding Padding}" />
+                                        </Border>
+                                        <Border Name="SelectedBorder" 
+                                                Background="{StaticResource PrimaryBrush}" 
+                                                Height="3" 
+                                                VerticalAlignment="Bottom" 
+                                                Visibility="Collapsed"/>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter TargetName="SelectedBorder" Property="Visibility" Value="Visible" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                    <!-- Header Text Style -->
+                    <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+                        <Setter Property="FontSize" Value="20"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                        <Setter Property="Margin" Value="0,0,0,15"/>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

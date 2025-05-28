@@ -29,6 +29,9 @@ namespace gym
             {
                 InitializeComponent();
 
+                // Set DataContext to this window for bindings to work
+                DataContext = this;
+
                 // Initialize database
                 _workoutDB = new WorkoutDB();
 
@@ -37,6 +40,9 @@ namespace gym
 
                 // Set the ItemsSource immediately with empty collection
                 WorkoutListView.ItemsSource = Workouts;
+
+                // Show the Workouts tab by default
+                ShowTab("WorkoutsTab");
 
                 // Load data asynchronously
                 LoadDataAsync();
@@ -47,6 +53,24 @@ namespace gym
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private async Task AddSampleDataToDatabase()
+        {
+            try
+            {
+                var sampleWorkouts = CreateSampleWorkouts();
+                foreach (var workout in sampleWorkouts)
+                {
+                    await _workoutDB.InsertWorkoutAsync(workout);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding sample data: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
 
         private async void LoadDataAsync()
         {
@@ -64,7 +88,8 @@ namespace gym
                 }
 
                 // Update the UI with the data from database
-                await Dispatcher.InvokeAsync(() => {
+                await Dispatcher.InvokeAsync(() =>
+                {
                     Workouts.Clear();
 
                     // Sort by date (newest first)
@@ -74,56 +99,40 @@ namespace gym
                     {
                         Workouts.Add(workout);
                     }
-
-                    // Format the date column in the ListView
-                    if (WorkoutListView.View is GridView gridView)
-                    {
-                        foreach (var column in gridView.Columns)
-                        {
-                            if (column.Header.ToString() == "Date")
-                            {
-                                // Update binding to use a date format
-                                var binding = new Binding("Date")
-                                {
-                                    StringFormat = "MM/dd/yyyy"
-                                };
-                                column.DisplayMemberBinding = binding;
-                            }
-                        }
-                    }
                 });
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => {
+                await Dispatcher.InvokeAsync(() =>
+                {
                     MessageBox.Show($"Error loading data: {ex.Message}", "Database Error",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 });
             }
         }
 
-        private async Task AddSampleDataToDatabase()
+        // Shows the selected tab and hides others
+        private void ShowTab(string tabName)
         {
-            try
+            foreach (TabItem tab in MainTabControl.Items)
             {
-                var sampleWorkouts = CreateSampleWorkouts();
-
-                foreach (var workout in sampleWorkouts)
+                if (tab.Name == tabName)
                 {
-                    await _workoutDB.InsertWorkoutAsync(workout);
+                    tab.Visibility = Visibility.Visible;
+                    tab.IsSelected = true;
                 }
-
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show("Sample data added to database successfully.", "Database",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                });
+                else
+                {
+                    tab.Visibility = Visibility.Collapsed;
+                }
             }
-            catch (Exception ex)
+        }
+
+        private void NavigationButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string tabName)
             {
-                await Dispatcher.InvokeAsync(() => {
-                    MessageBox.Show($"Error saving sample data: {ex.Message}", "Database Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                ShowTab(tabName);
             }
         }
 
@@ -281,6 +290,47 @@ namespace gym
             catch (Exception ex)
             {
                 MessageBox.Show($"Error opening progress window: {ex.Message}\n\nStack trace: {ex.StackTrace}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        // New method for handling template workouts
+        private void LogTemplateWorkout_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Tag is string exerciseName)
+                {
+                    // Pre-fill exercise name in the add workout window
+                    AddWorkoutWindow addWorkoutWindow = new AddWorkoutWindow();
+
+                    // Determine category from tab
+                    string category = "Push";
+                    if (PullTab.IsSelected) category = "Pull";
+                    else if (LegsTab.IsSelected) category = "Legs";
+
+                    // Pre-fill workout details
+                    addWorkoutWindow.PreFillExercise(exerciseName, category);
+
+                    if (addWorkoutWindow.ShowDialog() == true && addWorkoutWindow.NewWorkout != null)
+                    {
+                        // Make sure ID is set
+                        if (string.IsNullOrEmpty(addWorkoutWindow.NewWorkout.Id))
+                        {
+                            addWorkoutWindow.NewWorkout.Id = ObjectId.GenerateNewId().ToString();
+                        }
+
+                        // Add to collection and save to database
+                        Workouts.Insert(0, addWorkoutWindow.NewWorkout); // Add at the top
+                        _workoutDB.InsertWorkout(addWorkoutWindow.NewWorkout);
+
+                        // After logging a workout, return to the workouts tab
+                        ShowTab("WorkoutsTab");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error logging workout: {ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

@@ -305,7 +305,29 @@ namespace gym
                 SummaryText.Text = "No data to display.";
                 return;
             }
-            // ... rest of your code
+            if (SummaryText == null) return;
+            if (_filteredWorkouts == null || _filteredWorkouts.Count == 0)
+            {
+                SummaryText.Text = "No data to display.";
+                return;
+            }
+
+            int totalWorkouts = _filteredWorkouts.Count;
+            double totalVolume = _filteredWorkouts.Sum(w => w.Reps * w.Sets * w.Weight);
+            double avgReps = _filteredWorkouts.Average(w => w.Reps);
+            double avgWeight = _filteredWorkouts.Average(w => w.Weight);
+            var maxWeightByExercise = _filteredWorkouts
+                .GroupBy(w => w.Exercise)
+                .Select(g => $"{g.Key}: {g.Max(w => w.Weight)}kg");
+            DateTime lastWorkout = _filteredWorkouts.Max(w => w.Date);
+
+            SummaryText.Text =
+                $"Total Workouts: {totalWorkouts}\n" +
+                $"Total Volume: {totalVolume:F1}\n" +
+                $"Average Reps: {avgReps:F1}\n" +
+                $"Average Weight: {avgWeight:F1}kg\n" +
+                $"Best Weight per Exercise:\n  {string.Join("\n  ", maxWeightByExercise)}\n" +
+                $"Most Recent Workout: {lastWorkout:d}";
         }
     }
 }
