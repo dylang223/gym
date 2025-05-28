@@ -14,8 +14,8 @@ namespace gym
         private IMongoCollection<Workout> _workouts;
         private bool _isConnected = false;
 
-        // Changed to use localhost by default with Atlas as fallback
-        public WorkoutDB(string connectionString = "mongodb+srv://DylanGlynn:Topgear2015@wp1.edblxxv.mongodb.net/", string databaseName = "gymDB")
+        // Changed to use localhost by default with Atlas as fallbacks
+        public WorkoutDB(string connectionString = "mongodb+srv://<credentials>@wp1.edblxxv.mongodb.net/", string databaseName = "gymDB")
         {
             try
             {
