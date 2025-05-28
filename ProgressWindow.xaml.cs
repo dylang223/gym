@@ -213,7 +213,10 @@ namespace gym
 
                 foreach (var date in dates)
                 {
-                    var workoutOnDate = exerciseData.FirstOrDefault(w => w.Date.ToShortDateString() == date);
+                    var workoutOnDate = exerciseData
+                        .Where(w => w.Date.ToShortDateString() == date)
+                        .OrderByDescending(w => w.Weight)
+                        .FirstOrDefault();
 
                     // Instead of null values which break lines, use dummy values
                     if (workoutOnDate != null)
@@ -237,6 +240,7 @@ namespace gym
                         weightValues.Add(null);
                     }
                 }
+
 
                 // Reps series with enhanced visibility
                 Series.Add(new LineSeries<double?>
