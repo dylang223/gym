@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace gym
 {
-    public class WorkoutDB
+    public class WorkoutDB : IWorkoutRepository
     {
         private IMongoCollection<Workout> _workouts;
         private bool _isConnected = false;

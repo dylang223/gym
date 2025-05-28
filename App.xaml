@@ -5,6 +5,9 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+
             <ResourceDictionary.MergedDictionaries>
                 <!-- Colors -->
                 <ResourceDictionary>
