@@ -231,24 +231,43 @@ namespace gym
                 return _inMemoryWorkouts.Where(w => w.Date >= startDate && w.Date <= endDate).ToList();
             }
         }
-
-        // Test method made public for debugging
         public void AddTestWorkout()
         {
-            var workout = new Workout
-            {
-                Id = ObjectId.GenerateNewId().ToString(),
-                Category = "Strength",
-                Exercise = "Bench Press",
-                Reps = 10,
-                Sets = 3,
-                Weight = 135,
-                Date = DateTime.Now
-            };
+            // Clear existing in-memory workouts for repeatable results
+            _inMemoryWorkouts.Clear();
 
-            InsertWorkout(workout);
-            MessageBox.Show("Test workout added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            var startDate = DateTime.Now.AddDays(-30);
+
+            // Define exercises and their starting weights
+            var exercises = new[]
+            {
+        new { Name = "Bench Press", Category = "Push", StartWeight = 50.0, WeightStep = 2.5, StartReps = 8, RepsStep = 1 },
+        new { Name = "Squats", Category = "Legs", StartWeight = 60.0, WeightStep = 5.0, StartReps = 8, RepsStep = 1 },
+        new { Name = "Deadlift", Category = "Pull", StartWeight = 80.0, WeightStep = 5.0, StartReps = 6, RepsStep = 1 },
+        new { Name = "Overhead Shoulder Press", Category = "Push", StartWeight = 30.0, WeightStep = 2.5, StartReps = 8, RepsStep = 1 },
+        new { Name = "Triceps Pushdown", Category = "Push", StartWeight = 20.0, WeightStep = 2.5, StartReps = 12, RepsStep = 1 }
+    };
+
+            // Generate 8 sessions for each exercise, showing gradual improvement
+            for (int i = 0; i < 8; i++)
+            {
+                foreach (var ex in exercises)
+                {
+                    _inMemoryWorkouts.Add(new Workout
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Category = ex.Category,
+                        Exercise = ex.Name,
+                        Reps = ex.StartReps + i * ex.RepsStep,
+                        Sets = 3,
+                        Weight = ex.StartWeight + i * ex.WeightStep,
+                        Date = startDate.AddDays(i * 4) // every 4 days
+                    });
+                }
+            }
         }
+
+
 
         // Status method to check connection
         public bool IsConnected()

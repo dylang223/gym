@@ -156,11 +156,11 @@ namespace gym
                 Series = new List<ISeries>();
                 XAxes = new List<Axis>
                 {
-                    new Axis { Name = "Date", Labels = new List<string> { "No Data" } }
+                    new Axis { Name = "Date", Labels = new List<string> { "No Data" }, TextSize = 14 }
                 };
                 YAxes = new List<Axis>
                 {
-                    new Axis { Name = "Reps/Weight" }
+                    new Axis { Name = "Reps/Weight", TextSize = 14 }
                 };
                 DataContext = null;
                 DataContext = this;
@@ -175,47 +175,99 @@ namespace gym
             var colors = new List<SKColor>
             {
                 SKColors.DodgerBlue, SKColors.Crimson, SKColors.ForestGreen,
-                SKColors.Orange, SKColors.Purple, SKColors.DeepPink, SKColors.Teal
+                SKColors.Orange, SKColors.Purple, SKColors.DeepPink, SKColors.Teal,
+                SKColors.Gold, SKColors.CornflowerBlue, SKColors.HotPink, SKColors.LimeGreen
             };
             int colorIndex = 0;
 
             foreach (var group in groupedWorkouts)
             {
                 var exerciseData = group.ToList();
+
+                // If only one data point exists, duplicate it to create a visible line
+                if (exerciseData.Count == 1)
+                {
+                    var singlePoint = exerciseData[0];
+                    var duplicatePoint = new Workout
+                    {
+                        Id = singlePoint.Id,
+                        Category = singlePoint.Category,
+                        Exercise = singlePoint.Exercise,
+                        Reps = singlePoint.Reps,
+                        Sets = singlePoint.Sets,
+                        Weight = singlePoint.Weight,
+                        Date = singlePoint.Date.AddDays(7) // Add a week to create line
+                    };
+                    exerciseData.Add(duplicatePoint);
+
+                    // Add date if it doesn't exist
+                    if (!dates.Contains(duplicatePoint.Date.ToShortDateString()))
+                        dates.Add(duplicatePoint.Date.ToShortDateString());
+                }
+
+                // Sort dates array
+                dates = dates.OrderBy(d => DateTime.Parse(d)).ToList();
+
                 var repsValues = new List<double?>();
                 var weightValues = new List<double?>();
 
                 foreach (var date in dates)
                 {
                     var workoutOnDate = exerciseData.FirstOrDefault(w => w.Date.ToShortDateString() == date);
-                    repsValues.Add(workoutOnDate != null ? (double?)workoutOnDate.Reps : null);
-                    weightValues.Add(workoutOnDate != null ? workoutOnDate.Weight : null);
+
+                    // Instead of null values which break lines, use dummy values
+                    if (workoutOnDate != null)
+                    {
+                        repsValues.Add((double)workoutOnDate.Reps);
+                        weightValues.Add(workoutOnDate.Weight);
+                    }
+                    else if (repsValues.Count > 0) // Use last value to maintain line
+                    {
+                        // Use interpolation to keep lines connected
+                        double? lastReps = repsValues.Last();
+                        double? lastWeight = weightValues.Last();
+
+                        repsValues.Add(lastReps);
+                        weightValues.Add(lastWeight);
+                    }
+                    else
+                    {
+                        // First point with no data
+                        repsValues.Add(null);
+                        weightValues.Add(null);
+                    }
                 }
 
+                // Reps series with enhanced visibility
                 Series.Add(new LineSeries<double?>
                 {
                     Name = $"{group.Key} (Reps)",
                     Values = repsValues,
-                    GeometrySize = 10,
-                    Stroke = new SolidColorPaint(colors[colorIndex % colors.Count]) { StrokeThickness = 3 },
+                    GeometrySize = 10, // Size of dots
+                    Stroke = new SolidColorPaint(colors[colorIndex % colors.Count]) { StrokeThickness = 4 }, // Thicker lines
+                    GeometryStroke = new SolidColorPaint(SKColors.White) { StrokeThickness = 2 },
+                    GeometryFill = new SolidColorPaint(colors[colorIndex % colors.Count]),
                     Fill = null,
-                    LineSmoothness = 0.5
+                    LineSmoothness = 0.7 // Smoother curves between points
                 });
                 colorIndex++;
 
+                // Weight series with enhanced visibility
                 Series.Add(new LineSeries<double?>
                 {
                     Name = $"{group.Key} (Weight)",
                     Values = weightValues,
                     GeometrySize = 10,
-                    Stroke = new SolidColorPaint(colors[colorIndex % colors.Count]) { StrokeThickness = 3 },
+                    Stroke = new SolidColorPaint(colors[colorIndex % colors.Count]) { StrokeThickness = 4 }, // Thicker lines
                     GeometryFill = new SolidColorPaint(colors[colorIndex % colors.Count]),
+                    GeometryStroke = new SolidColorPaint(SKColors.White) { StrokeThickness = 2 },
                     Fill = null,
-                    LineSmoothness = 0.5
+                    LineSmoothness = 0.7 // Smoother curves between points
                 });
                 colorIndex++;
             }
 
+            // Enhanced axis visualization for both normal and fullscreen modes
             XAxes = new List<Axis>
             {
                 new Axis
@@ -223,18 +275,24 @@ namespace gym
                     Name = "Date",
                     Labels = dates,
                     LabelsRotation = 45,
-                    TextSize = 12
+                    TextSize = 14, // Larger text for full screen
+                    NamePaint = new SolidColorPaint(SKColors.DarkSlateGray), // Better color
+                    LabelsPaint = new SolidColorPaint(SKColors.DarkSlateGray)
                 }
             };
+
             YAxes = new List<Axis>
             {
                 new Axis
                 {
                     Name = "Reps/Weight",
-                    TextSize = 12
+                    TextSize = 14, // Larger text for full screen
+                    NamePaint = new SolidColorPaint(SKColors.DarkSlateGray), // Better color
+                    LabelsPaint = new SolidColorPaint(SKColors.DarkSlateGray)
                 }
             };
 
+            // Force chart to update
             DataContext = null;
             DataContext = this;
         }
@@ -249,6 +307,5 @@ namespace gym
             }
             // ... rest of your code
         }
-
     }
 }
