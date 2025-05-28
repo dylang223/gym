@@ -9,6 +9,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MongoDB.Bson;
+using System.Threading.Tasks;
 
 namespace gym
 {
@@ -18,62 +20,110 @@ namespace gym
     public partial class MainWindow : Window
     {
         public ObservableCollection<Workout> Workouts { get; set; }
+        private readonly WorkoutDB _workoutDB;
 
         public MainWindow()
         {
-            InitializeComponent();
-
-            // Initialize the Workouts collection with sample data
-            Workouts = new ObservableCollection<Workout>
+            try
             {
-                // Push Workouts
-                new Workout { Category = "Push", Exercise = "Bench Press", Reps = 8, Sets = 4, Weight = 50, Date = DateTime.Now.AddDays(-30) },
-                new Workout { Category = "Push", Exercise = "Incline Dumbbell Press", Reps = 10, Sets = 3, Weight = 40, Date = DateTime.Now.AddDays(-25) },
-                new Workout { Category = "Push", Exercise = "Overhead Shoulder Press", Reps = 10, Sets = 3, Weight = 30, Date = DateTime.Now.AddDays(-20) },
-                new Workout { Category = "Push", Exercise = "Triceps Pushdown", Reps = 12, Sets = 3, Weight = 20, Date = DateTime.Now.AddDays(-15) },
-                new Workout { Category = "Push", Exercise = "Lateral Raises", Reps = 15, Sets = 3, Weight = 10, Date = DateTime.Now.AddDays(-10) },
+                InitializeComponent();
 
-                // Pull Workouts
-                new Workout { Category = "Pull", Exercise = "Deadlift", Reps = 6, Sets = 4, Weight = 80, Date = DateTime.Now.AddDays(-28) },
-                new Workout { Category = "Pull", Exercise = "Pull-Ups", Reps = 10, Sets = 3, Weight = 0, Date = DateTime.Now.AddDays(-23) },
-                new Workout { Category = "Pull", Exercise = "Barbell Rows", Reps = 8, Sets = 3, Weight = 60, Date = DateTime.Now.AddDays(-18) },
-                new Workout { Category = "Pull", Exercise = "Face Pulls", Reps = 12, Sets = 3, Weight = 15, Date = DateTime.Now.AddDays(-13) },
-                new Workout { Category = "Pull", Exercise = "Biceps Curls", Reps = 12, Sets = 3, Weight = 12, Date = DateTime.Now.AddDays(-8) },
+                // Initialize database
+                _workoutDB = new WorkoutDB();
 
-                // Legs Workouts
-                new Workout { Category = "Legs", Exercise = "Squats", Reps = 8, Sets = 4, Weight = 70, Date = DateTime.Now.AddDays(-27) },
-                new Workout { Category = "Legs", Exercise = "Leg Press", Reps = 10, Sets = 3, Weight = 100, Date = DateTime.Now.AddDays(-22) },
-                new Workout { Category = "Legs", Exercise = "Romanian Deadlifts", Reps = 10, Sets = 3, Weight = 50, Date = DateTime.Now.AddDays(-17) },
-                new Workout { Category = "Legs", Exercise = "Walking Lunges", Reps = 12, Sets = 3, Weight = 20, Date = DateTime.Now.AddDays(-12) },
-                new Workout { Category = "Legs", Exercise = "Calf Raises", Reps = 15, Sets = 3, Weight = 15, Date = DateTime.Now.AddDays(-7) }
-            };
+                // Initialize the Workouts collection with sample data
+                Workouts = new ObservableCollection<Workout>
+                {
+                   
+                };
 
-            // Bind the Workouts collection to the ListView
-            WorkoutListView.ItemsSource = Workouts;
+                // Save sample data to database
+                SaveSampleDataToDatabase();
+
+                // Bind the Workouts collection to the ListView
+                WorkoutListView.ItemsSource = Workouts;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Initialization error: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void SaveSampleDataToDatabase()
+        {
+            try
+            {
+                // Clear existing database entries
+                var existingWorkouts = _workoutDB.GetAllWorkouts();
+                if (existingWorkouts.Count == 0)
+                {
+                    foreach (var workout in Workouts)
+                    {
+                        _workoutDB.InsertWorkout(workout);
+                    }
+                    MessageBox.Show("Sample data saved to database successfully.", "Database",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving sample data: {ex.Message}", "Database Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void OpenAddWorkoutWindow(object sender, RoutedEventArgs e)
         {
-            // Open the AddWorkoutWindow
-            AddWorkoutWindow addWorkoutWindow = new AddWorkoutWindow();
-            if (addWorkoutWindow.ShowDialog() == true)
+            try
             {
-                // Add the new workout to the collection
-                Workouts.Add(addWorkoutWindow.NewWorkout);
+                // Open the AddWorkoutWindow
+                AddWorkoutWindow addWorkoutWindow = new AddWorkoutWindow();
+                if (addWorkoutWindow.ShowDialog() == true && addWorkoutWindow.NewWorkout != null)
+                {
+                    // Make sure ID is set
+                    if (string.IsNullOrEmpty(addWorkoutWindow.NewWorkout.Id))
+                    {
+                        addWorkoutWindow.NewWorkout.Id = ObjectId.GenerateNewId().ToString();
+                    }
+
+                    // Add the new workout to the collection
+                    Workouts.Add(addWorkoutWindow.NewWorkout);
+
+                    // Save to database
+                    try
+                    {
+                        _workoutDB.InsertWorkout(addWorkoutWindow.NewWorkout);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error saving workout: {ex.Message}", "Database Error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding workout: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void OpenProgressWindow(object sender, RoutedEventArgs e)
         {
-            if (Workouts.Count == 0)
+            try
             {
-                MessageBox.Show("No workout data available to display progress.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
+                // Use database data directly instead of passing from here
+                ProgressWindow progressWindow = new ProgressWindow();
+                progressWindow.Owner = this; // Set owner to avoid window appearing behind
+                progressWindow.ShowDialog();
             }
-
-            // Open the ProgressWindow and pass the workouts
-            ProgressWindow progressWindow = new ProgressWindow(Workouts.ToList());
-            progressWindow.ShowDialog();
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening progress window: {ex.Message}\n\nStack trace: {ex.StackTrace}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
     }
 }
