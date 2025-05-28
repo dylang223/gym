@@ -45,7 +45,7 @@ namespace gym
                 ShowTab("WorkoutsTab");
 
                 // Load data asynchronously
-                LoadDataAsync();
+                LoadDataAndStatsAsync();
             }
             catch (Exception ex)
             {
@@ -71,8 +71,8 @@ namespace gym
             }
         }
 
-
-        private async void LoadDataAsync()
+        // Renamed to avoid ambiguity
+        private async void LoadDataAndStatsAsync()
         {
             try
             {
@@ -99,6 +99,9 @@ namespace gym
                     {
                         Workouts.Add(workout);
                     }
+
+                    // Update the stats after loading data
+                    UpdateWorkoutStats();
                 });
             }
             catch (Exception ex)
@@ -111,7 +114,6 @@ namespace gym
             }
         }
 
-        // Shows the selected tab and hides others
         private void ShowTab(string tabName)
         {
             foreach (TabItem tab in MainTabControl.Items)
@@ -240,8 +242,6 @@ namespace gym
             return workouts;
         }
 
-
-
         private void OpenAddWorkoutWindow(object sender, RoutedEventArgs e)
         {
             try
@@ -258,6 +258,9 @@ namespace gym
 
                     // Add the new workout to the collection
                     Workouts.Add(addWorkoutWindow.NewWorkout);
+
+                    // Update stats after adding a new workout
+                    UpdateWorkoutStats();
 
                     // Save to database
                     try
@@ -331,6 +334,156 @@ namespace gym
             catch (Exception ex)
             {
                 MessageBox.Show($"Error logging workout: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void UpdateWorkoutStats()
+        {
+            try
+            {
+                // Create a list of workout statistics
+                var stats = new ObservableCollection<WorkoutStat>();
+
+                // Only process if we have workouts
+                if (Workouts.Count > 0)
+                {
+                    // Total workouts
+                    stats.Add(new WorkoutStat
+                    {
+                        StatName = "Total Workouts",
+                        Value = Workouts.Count.ToString(),
+                        Description = "Total number of workouts recorded",
+                        Icon = "📝"
+                    });
+
+                    // Most recent workout
+                    var mostRecent = Workouts.OrderByDescending(w => w.Date).FirstOrDefault();
+                    stats.Add(new WorkoutStat
+                    {
+                        StatName = "Most Recent Workout",
+                        Value = mostRecent?.Date.ToString("MM/dd/yyyy"),
+                        Description = $"{mostRecent?.Exercise} ({mostRecent?.Category})",
+                        Icon = "🔄"
+                    });
+
+                    // Calculate total volume
+                    double totalVolume = Workouts.Sum(w => w.Sets * w.Reps * w.Weight);
+                    stats.Add(new WorkoutStat
+                    {
+                        StatName = "Total Volume Lifted",
+                        Value = $"{totalVolume:N0} kg",
+                        Description = "Sum of (sets × reps × weight) across all workouts",
+                        Icon = "💪"
+                    });
+
+                    // Most frequent exercise
+                    var mostFrequentExercise = Workouts
+                        .GroupBy(w => w.Exercise)
+                        .OrderByDescending(g => g.Count())
+                        .FirstOrDefault();
+                    stats.Add(new WorkoutStat
+                    {
+                        StatName = "Most Frequent Exercise",
+                        Value = mostFrequentExercise?.Key ?? "N/A",
+                        Description = $"Performed {mostFrequentExercise?.Count() ?? 0} times",
+                        Icon = "🏆"
+                    });
+
+                    // Heaviest workout
+                    var heaviestWorkout = Workouts.OrderByDescending(w => w.Weight).FirstOrDefault();
+                    stats.Add(new WorkoutStat
+                    {
+                        StatName = "Heaviest Weight Lifted",
+                        Value = $"{heaviestWorkout?.Weight:F1} kg",
+                        Description = $"{heaviestWorkout?.Exercise} on {heaviestWorkout?.Date.ToString("MM/dd/yyyy")}",
+                        Icon = "🏋️‍♂️"
+                    });
+
+                    // Most improved exercise
+                    var exercises = Workouts
+                        .GroupBy(w => w.Exercise)
+                        .Where(g => g.Count() >= 2)
+                        .Select(g => new
+                        {
+                            Exercise = g.Key,
+                            FirstWorkout = g.OrderBy(w => w.Date).First(),
+                            LastWorkout = g.OrderBy(w => w.Date).Last(),
+                        })
+                        .Select(e => new
+                        {
+                            e.Exercise,
+                            WeightGain = e.LastWorkout.Weight - e.FirstWorkout.Weight,
+                            FirstDate = e.FirstWorkout.Date,
+                            LastDate = e.LastWorkout.Date
+                        })
+                        .OrderByDescending(e => e.WeightGain)
+                        .FirstOrDefault();
+
+                    if (exercises != null)
+                    {
+                        stats.Add(new WorkoutStat
+                        {
+                            StatName = "Most Improved Exercise",
+                            Value = $"+{exercises.WeightGain:F1} kg",
+                            Description = $"{exercises.Exercise} - from {exercises.FirstDate:MM/dd} to {exercises.LastDate:MM/dd}",
+                            Icon = "📈"
+                        });
+                    }
+
+                    // Category breakdown
+                    var categoryCount = Workouts
+                        .GroupBy(w => w.Category)
+                        .Select(g => new { Category = g.Key, Count = g.Count() })
+                        .OrderByDescending(c => c.Count)
+                        .FirstOrDefault();
+
+                    if (categoryCount != null)
+                    {
+                        stats.Add(new WorkoutStat
+                        {
+                            StatName = "Most Trained Category",
+                            Value = categoryCount.Category,
+                            Description = $"Trained {categoryCount.Count} times ({(100.0 * categoryCount.Count / Workouts.Count):F0}% of all workouts)",
+                            Icon = "🎯"
+                        });
+                    }
+
+                    // Average workouts per week
+                    if (Workouts.Count >= 2)
+                    {
+                        var firstDate = Workouts.Min(w => w.Date);
+                        var lastDate = Workouts.Max(w => w.Date);
+                        var totalWeeks = Math.Max(1, (lastDate - firstDate).TotalDays / 7.0);
+                        var workoutsPerWeek = Workouts.Count / totalWeeks;
+
+                        stats.Add(new WorkoutStat
+                        {
+                            StatName = "Workouts per Week",
+                            Value = $"{workoutsPerWeek:F1}",
+                            Description = $"Average workouts per week over {totalWeeks:F0} weeks",
+                            Icon = "📅"
+                        });
+                    }
+                }
+                else
+                {
+                    // No workouts yet
+                    stats.Add(new WorkoutStat
+                    {
+                        StatName = "No Workouts",
+                        Value = "0",
+                        Description = "Add your first workout to see statistics",
+                        Icon = "➕"
+                    });
+                }
+
+                // Bind to the ItemsControl
+                StatsItemsControl.ItemsSource = stats;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error calculating workout statistics: {ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

@@ -97,6 +97,18 @@
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Left"
                             Margin="10,5"/>
+                    <Button x:Name="StatsButton" 
+                            
+                            Content="Workout Stats"
+                            Click="NavigationButton_Click"
+                            Tag="StatsTab"
+                            Style="{StaticResource ModernButton}"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Margin="10,5"/>
+
 
                     <Button x:Name="ProgressButton"
                             Content="Progress Charts" 
@@ -248,14 +260,11 @@
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <TextBlock Text="{Binding Sets, Converter={StaticResource VolumeConverter}, ConverterParameter={RelativeSource Self}}" />
-
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-
                                         </GridView>
                                     </ListView.View>
-                                    <!-- ... -->
                                 </ListView>
                             </Border>
                         </Grid>
@@ -459,6 +468,76 @@
                                                             Tag="{Binding Exercise}"
                                                             Style="{StaticResource ModernButton}"
                                                             Click="LogTemplateWorkout_Click"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Stats Summary Tab -->
+                    <TabItem x:Name="StatsTab" Header="Workout Stats" Style="{StaticResource ModernTabItem}" Visibility="Collapsed">
+                        <Grid Margin="20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" 
+                                       Text="Workout Statistics Summary" 
+                                       Style="{StaticResource HeaderTextStyle}"/>
+
+                            <TextBlock Grid.Row="1" 
+                                       Text="Key performance metrics and achievements" 
+                                       Foreground="{StaticResource TextSecondaryBrush}" 
+                                       Margin="0,0,0,15"/>
+
+                            <Border Grid.Row="2"
+                                    Background="White"
+                                    CornerRadius="6"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1">
+
+                                <ItemsControl x:Name="StatsItemsControl" Margin="15">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource CardBackgroundBrush}"
+                                                    Margin="0,8"
+                                                    Padding="15"
+                                                    CornerRadius="6">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Column="0" 
+                                                               Text="{Binding Icon}" 
+                                                               FontSize="28"
+                                                               VerticalAlignment="Center"
+                                                               Margin="0,0,15,0"/>
+
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding StatName}" 
+                                                                   FontWeight="SemiBold" 
+                                                                   FontSize="16"/>
+                                                        <TextBlock Text="{Binding Description}" 
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                                   Margin="0,5,0,0"
+                                                                   TextWrapping="Wrap"/>
+                                                    </StackPanel>
+
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Value}" 
+                                                               FontWeight="Bold"
+                                                               FontSize="20"
+                                                               Foreground="{StaticResource PrimaryDarkBrush}"
+                                                               VerticalAlignment="Center"
+                                                               Margin="15,0,0,0"/>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
